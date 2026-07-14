@@ -36,7 +36,14 @@ when not declared(imported_vm):
     type GetExecable = GetStatable or ProperStates
 
 
-    iterator pass_through_state(states: ExecFormat): seq[TapeValue]=
+    type MachionState = object
+        tape: seq[TapeValue]
+        current_state_name: string
+        current_head_place: int
+        current_head_value: TapeValue
+
+
+    iterator pass_through_state(states: ExecFormat): MachionState=
         var tape: seq[TapeValue] = @[TapeValue.ZERO]
         var min_head: int = 0
         var max_head: int = 0
@@ -77,12 +84,15 @@ when not declared(imported_vm):
                     set(case1.set.tape_val)
                     move(case1.move.dir)
                     current_state_name = case1.goto.name
-            yield tape
+            yield MachionState(tape:tape,
+                               current_state_name: current_state_name,
+                               current_head_place: head,
+                               current_head_value: tape[head-min_head])
 
 
     proc exec(states: ExecFormat): void=
         for i in pass_through_state(states):
-            echo i
+            echo i.tape
 
 
     proc exec(states: GetExecable): Result[void, ReasonsStateNotProper]=
@@ -91,5 +101,20 @@ when not declared(imported_vm):
             return err[void, ReasonsStateNotProper](potential_states.err)
         exec(potential_states.get())
 
+
+    proc debug(states: ExecFormat): void=
+        for i in pass_through_state(states):
+            echo fmt"tape {i.tape}"
+            echo fmt"head place {i.current_head_place}"
+            echo fmt"head value {i.current_head_value}"
+            echo fmt"state_name {i.current_state_name}"
+            var _ = stdin.readLine()
+
+
+    proc debug(states: GetExecable): Result[void, ReasonsStateNotProper]=
+        var potential_states: Result[ExecFormat, ReasonsStateNotProper] = states_to_exec_fmt(states)
+        if potential_states.is_err:
+            return err[void, ReasonsStateNotProper](potential_states.err)
+        debug(potential_states.get())
 
     type Runnable = ExecFormat or GetExecable

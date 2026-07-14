@@ -1,0 +1,20 @@
+state main {
+    got 0 {
+        set 1
+        move LEFT
+        goto a
+    }
+    got 1 {
+        halt
+    }
+}
+state a {
+    got 0 {
+        set 1
+        move RIGHT
+        goto main
+    }
+    got 1 {
+        halt
+    }
+}

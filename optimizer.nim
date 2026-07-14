@@ -44,6 +44,9 @@ when not declared(imported_optimizer):
         var new_optomized_states: ProperStates
         for i in optimize_loop(states):
             new_optomized_states = i
+            echo i
+        if new_optomized_states.states == @[]:
+            return states
         return new_optomized_states
 
 
