@@ -1,12 +1,14 @@
 import std/cmdline
 import std/options
 import std/strutils
+import std/strformat
 include optimizer
 include vm
 
 type TerminalCommandKind = enum
     RUN = "run",
-    OPTIMIZE = "optomize"
+    OPTIMIZE = "optomize",
+    UNVALID
 
 
 type TerminalCommand = object
@@ -15,11 +17,14 @@ type TerminalCommand = object
             file_to_run: string
         of OPTIMIZE:
             file_to_optimize: string
+        of UNVALID:
+            name: string
+        
 
 
 
 func parse_args(args: seq[string]): TerminalCommand=
-    let arg_kind = parse_enum[TerminalCommandKind](args[0])
+    let arg_kind: TerminalCommandKind = parse_enum(args[0], TerminalCommandKind.UNVALID)
     case arg_kind:
         of RUN:
             return TerminalCommand(kind: arg_kind,
@@ -27,6 +32,9 @@ func parse_args(args: seq[string]): TerminalCommand=
         of OPTIMIZE:
             return TerminalCommand(kind: arg_kind,
                                    file_to_optimize: args[1])
+        of UNVALID:
+            return TerminalCommand(kind: arg_kind,
+                                   name: args[1])
 
 
 var commands = parse_args(command_line_params())
@@ -41,3 +49,5 @@ case commands.kind:
     of OPTIMIZE:
         var text: string = read_file(commands.file_to_optimize)
         echo optimize(text).repr()
+    of UNVALID:
+        echo fmt"UNVALID COMMAND {commands.name}"
