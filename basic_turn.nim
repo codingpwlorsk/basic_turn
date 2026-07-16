@@ -2,8 +2,11 @@ import std/cmdline
 import std/options
 import std/strutils
 import std/strformat
-include optimizer
-include vm
+import optimizer
+import vm
+import result
+import states
+
 
 type TerminalCommandKind = enum
     RUN = "run",
