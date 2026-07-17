@@ -2,20 +2,14 @@ import std/tables
 import std/strformat
 import states
 import result
-import optimizer
 
 
 type ExecFormat* = object
     table*: TableRef[string, State]
 
 
-func `[]`(self: ExecFormat, key: string): State=
+func `[]`*(self: ExecFormat, key: string): State=
     return self.table[key]
-
-
-func `tables=`(self: ExecFormat): void=
-    type immutable = ref Defect
-    raise immutable()
 
 
 func states_to_exec_fmt*(states: ProperStates): Result[ExecFormat, ReasonsStateNotProper]=
@@ -29,7 +23,7 @@ proc states_to_exec_fmt*(stateable: GetStatable): Result[ExecFormat, ReasonsStat
     var potentail_states = get_states(stateable)
     if not potentail_states.is_okay:
         return err[ExecFormat, ReasonsStateNotProper](potentail_states.err)
-    return okay[ExecFormat, ReasonsStateNotProper](states_to_exec_fmt(potentail_states.get()))
+    return states_to_exec_fmt(potentail_states.get())
 
 
 type GetExecable* = GetStatable or ProperStates

@@ -5,14 +5,27 @@ state main {
         goto a
     }
     got 1 {
-        halt
+        set 0
+        move LEFT
+        goto a
     }
 }
 state a {
     got 0 {
+        set 0
+        move RIGHT
+        goto b
+    }
+    got 1 {
         set 1
         move RIGHT
-        goto main
+        goto b
+    }
+}
+
+state b {
+    got 0 {
+        halt
     }
     got 1 {
         halt
